@@ -1,15 +1,16 @@
 {
   "releaseId": "shared-framing-2026-11-15",
   "name": "共同取景发行 · 镜头演示发布",
-  "generatedAt": "2026-11-15T09:14:45.473Z",
+  "generatedAt": "2026-11-15T09:18:14.269Z",
   "url": "http://127.0.0.1:4173/",
   "provenance": {
     "mode": "净目录（临时副本）",
-    "sourceRev": "36cfadb18f1bb009d4a18dbb1779e265fe9a875d",
+    "sourceRev": "314271f281539fd20b5236585e495a6cc3e306d1",
     "workingTreeDirty": "no",
-    "releaseRoot": "/tmp/shared-framing-release-O9TYUM"
+    "releaseRoot": "/tmp/shared-framing-release-yHAifG"
   },
   "pass": true,
+  "adopt": "allowed",
   "artifactPolicy": {
     "adoptOnlyWhen": "pass",
     "note": "共同取景失败禁止采用产物；只有原始记录核验通过后才允许采纳构建。"
@@ -96,7 +97,7 @@
       "id": "gui.drag_multi",
       "label": "画布内移动多名角色并重解",
       "ok": true,
-      "detail": "移动 tall,slim · solves 12→37"
+      "detail": "移动 tall,slim · solves 12→39"
     },
     {
       "id": "dragged.safe_range",
@@ -114,7 +115,7 @@
       "id": "dragged.body_boxes",
       "label": "包围框为真实身体投影（非点）",
       "ok": true,
-      "detail": "高个 70×162px/1490 · 矮个 31×85px/1490 · 宽体 57×108px/1490 · 瘦高 50×194px/1490"
+      "detail": "高个 58×135px/1490 · 矮个 27×74px/1490 · 宽体 49×93px/1490 · 瘦高 57×218px/1490"
     },
     {
       "id": "realtime.playback",
@@ -162,7 +163,7 @@
       "id": "gui.reframe_dispersed",
       "label": "界面按钮在分散态复算仍为取舍",
       "ok": true,
-      "detail": "status=tradeoff solves 108→109"
+      "detail": "status=tradeoff solves 104→105"
     },
     {
       "id": "recluster.fitted",
