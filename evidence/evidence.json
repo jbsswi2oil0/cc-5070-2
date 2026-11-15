@@ -1,0 +1,222 @@
+{
+  "releaseId": "shared-framing-2026-11-15",
+  "name": "共同取景发行 · 镜头演示发布",
+  "generatedAt": "2026-11-15T09:14:45.473Z",
+  "url": "http://127.0.0.1:4173/",
+  "provenance": {
+    "mode": "净目录（临时副本）",
+    "sourceRev": "36cfadb18f1bb009d4a18dbb1779e265fe9a875d",
+    "workingTreeDirty": "no",
+    "releaseRoot": "/tmp/shared-framing-release-O9TYUM"
+  },
+  "pass": true,
+  "artifactPolicy": {
+    "adoptOnlyWhen": "pass",
+    "note": "共同取景失败禁止采用产物；只有原始记录核验通过后才允许采纳构建。"
+  },
+  "totals": {
+    "total": 33,
+    "passed": 33,
+    "failed": 0
+  },
+  "checks": [
+    {
+      "id": "build",
+      "label": "生产构建",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "id": "serve",
+      "label": "启动运行配置指向的服务",
+      "ok": true,
+      "detail": "http://127.0.0.1:4173/"
+    },
+    {
+      "id": "boot.controller",
+      "label": "控制器实际执行（非预设机位）",
+      "ok": true,
+      "detail": "solves=3 scenario=deployment status=fitted"
+    },
+    {
+      "id": "initial.actors_present",
+      "label": "角色数据齐全",
+      "ok": true,
+      "detail": "4 名必需角色齐全"
+    },
+    {
+      "id": "initial.body_size_spread",
+      "label": "不同体型部署",
+      "ok": true,
+      "detail": "身高差 0.62m≥0.45 · 半径差 0.24m≥0.15"
+    },
+    {
+      "id": "initial.fov_limits",
+      "label": "视场限制读取",
+      "ok": true,
+      "detail": "fov=38.06°∈[6,44] h=63.03°≤74 d=4.42"
+    },
+    {
+      "id": "initial.safe_range",
+      "label": "目标屏幕安全区范围",
+      "ok": true,
+      "detail": "left=0.080 right=0.920 top=0.080 bottom=0.920"
+    },
+    {
+      "id": "initial.target_bounds",
+      "label": "目标边界与安全区对应",
+      "ok": true,
+      "detail": "tall:in short:in broad:in slim:in"
+    },
+    {
+      "id": "initial.body_boxes",
+      "label": "包围框为真实身体投影（非点）",
+      "ok": true,
+      "detail": "高个 180×427px/1490 · 矮个 100×272px/1490 · 宽体 201×374px/1490 · 瘦高 93×368px/1490"
+    },
+    {
+      "id": "initial.fitted",
+      "label": "聚合状态完整入画",
+      "ok": true,
+      "detail": "status=fitted in=4/4"
+    },
+    {
+      "id": "gui.reframe",
+      "label": "界面按钮调用共同取景实现",
+      "ok": true,
+      "detail": "solve 3→4 status=fitted bounds=4 actors"
+    },
+    {
+      "id": "gui.margins",
+      "label": "界面滑杆改边距参与求解",
+      "ok": true,
+      "detail": "leftPx 88.3→132.5 topPx 49.7→74.5 margin=0.120"
+    },
+    {
+      "id": "gui.drag_multi",
+      "label": "画布内移动多名角色并重解",
+      "ok": true,
+      "detail": "移动 tall,slim · solves 12→37"
+    },
+    {
+      "id": "dragged.safe_range",
+      "label": "目标屏幕安全区范围",
+      "ok": true,
+      "detail": "left=0.080 right=0.920 top=0.080 bottom=0.920"
+    },
+    {
+      "id": "dragged.target_bounds",
+      "label": "目标边界与安全区对应",
+      "ok": true,
+      "detail": "tall:in short:in broad:in slim:in"
+    },
+    {
+      "id": "dragged.body_boxes",
+      "label": "包围框为真实身体投影（非点）",
+      "ok": true,
+      "detail": "高个 70×162px/1490 · 矮个 31×85px/1490 · 宽体 57×108px/1490 · 瘦高 50×194px/1490"
+    },
+    {
+      "id": "realtime.playback",
+      "label": "实时相机运行器逐帧重解",
+      "ok": true,
+      "detail": "11/16 帧相机移动 · 角色位移=有 · 状态 fitted/tradeoff"
+    },
+    {
+      "id": "dispersed.tradeoff",
+      "label": "目标分散触发显式取舍",
+      "ok": true,
+      "detail": "status=tradeoff fov=44.0 clipped=short"
+    },
+    {
+      "id": "dispersed.fov_limits",
+      "label": "视场限制读取",
+      "ok": true,
+      "detail": "fov=44.00°∈[6,44] h=71.38°≤74 d=16.00"
+    },
+    {
+      "id": "dispersed.safe_range",
+      "label": "目标屏幕安全区范围",
+      "ok": true,
+      "detail": "left=0.080 right=0.920 top=0.080 bottom=0.920"
+    },
+    {
+      "id": "dispersed.target_bounds",
+      "label": "目标边界与安全区对应",
+      "ok": true,
+      "detail": "tall:in short:out broad:in slim:in"
+    },
+    {
+      "id": "dispersed.body_boxes",
+      "label": "包围框为真实身体投影（非点）",
+      "ok": true,
+      "detail": "高个 38×83px/1490 · 矮个 40×88px/1490 · 宽体 29×56px/1490 · 瘦高 43×176px/1490"
+    },
+    {
+      "id": "dispersed.outside_safe",
+      "label": "取舍时确有目标越过安全区（真实边界）",
+      "ok": true,
+      "detail": "tall:in short:out broad:in slim:in"
+    },
+    {
+      "id": "gui.reframe_dispersed",
+      "label": "界面按钮在分散态复算仍为取舍",
+      "ok": true,
+      "detail": "status=tradeoff solves 108→109"
+    },
+    {
+      "id": "recluster.fitted",
+      "label": "重新聚合恢复完整入画",
+      "ok": true,
+      "detail": "status=fitted in=4/4"
+    },
+    {
+      "id": "recluster.safe_range",
+      "label": "目标屏幕安全区范围",
+      "ok": true,
+      "detail": "left=0.080 right=0.920 top=0.080 bottom=0.920"
+    },
+    {
+      "id": "recluster.target_bounds",
+      "label": "目标边界与安全区对应",
+      "ok": true,
+      "detail": "tall:in short:in broad:in slim:in"
+    },
+    {
+      "id": "recluster.body_boxes",
+      "label": "包围框为真实身体投影（非点）",
+      "ok": true,
+      "detail": "高个 74×181px/1490 · 矮个 45×120px/1490 · 宽体 81×154px/1490 · 瘦高 38×161px/1490"
+    },
+    {
+      "id": "legacy.plaza",
+      "label": "旧样例 plaza 运行到底",
+      "ok": true,
+      "detail": "b1:fitted b2:fitted b3:fitted b4:fitted"
+    },
+    {
+      "id": "legacy.stagger",
+      "label": "旧样例 stagger 运行到底",
+      "ok": true,
+      "detail": "b1:fitted b2:fitted b3:fitted b4:fitted"
+    },
+    {
+      "id": "legacy.wide-spread",
+      "label": "旧样例 wide-spread 运行到底",
+      "ok": true,
+      "detail": "b1:tradeoff b2:tradeoff b3:tradeoff b4:tradeoff"
+    },
+    {
+      "id": "legacy.two-shot",
+      "label": "旧样例 two-shot 运行到底",
+      "ok": true,
+      "detail": "b1:fitted b2:fitted b3:fitted b4:fitted"
+    },
+    {
+      "id": "runtime.errors",
+      "label": "运行期无页面错误",
+      "ok": true,
+      "detail": "none"
+    }
+  ]
+}

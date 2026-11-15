@@ -1,0 +1,120 @@
+{
+  "camera": {
+    "position": {
+      "x": 0.0374999999999992,
+      "y": 0.900965557272662,
+      "z": -15.826810789356404
+    },
+    "forward": {
+      "x": 0,
+      "y": 0.004694349378052707,
+      "z": 0.9999889814812543
+    },
+    "right": {
+      "x": -0.9999999999999999,
+      "y": 0,
+      "z": 0
+    },
+    "up": {
+      "x": 0,
+      "y": 0.9999889814812544,
+      "z": -0.004694349378052707
+    },
+    "target": {
+      "x": 0.0374999999999992,
+      "y": 0.9760751473215054,
+      "z": 0.17301291434366384
+    },
+    "yawDeg": 0,
+    "pitchDeg": 0.2689673947971025,
+    "fovDeg": 44,
+    "horizontalFovDeg": 71.3770194147022,
+    "distance": 16,
+    "aspect": 1.7777777777777777,
+    "params": {
+      "r": 16,
+      "s": -2.9303571428571424,
+      "h": -0.3375,
+      "pitchDeg": 0.2689673947971025
+    }
+  },
+  "safe": {
+    "left": -0.84,
+    "right": 0.84,
+    "top": 0.84,
+    "bottom": -0.84
+  },
+  "status": "tradeoff",
+  "reports": [
+    {
+      "id": "tall",
+      "insideSafe": true,
+      "maxOverflow": 0
+    },
+    {
+      "id": "short",
+      "insideSafe": false,
+      "maxOverflow": 0.20073181567301213
+    },
+    {
+      "id": "broad",
+      "insideSafe": true,
+      "maxOverflow": 0
+    },
+    {
+      "id": "slim",
+      "insideSafe": true,
+      "maxOverflow": 0
+    }
+  ],
+  "actors": [
+    {
+      "id": "tall",
+      "name": "高个",
+      "position": {
+        "x": -10.5,
+        "y": 1.1,
+        "z": 3
+      },
+      "height": 2.04,
+      "radius": 0.4,
+      "importance": 5
+    },
+    {
+      "id": "short",
+      "name": "矮个",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -3.3999999999999995
+      },
+      "height": 1.42,
+      "radius": 0.26,
+      "importance": 2
+    },
+    {
+      "id": "broad",
+      "name": "宽体",
+      "position": {
+        "x": 1.2,
+        "y": 0,
+        "z": 8.2
+      },
+      "height": 1.74,
+      "radius": 0.46,
+      "importance": 3
+    },
+    {
+      "id": "slim",
+      "name": "瘦高",
+      "position": {
+        "x": -2.4,
+        "y": 0,
+        "z": -7.6
+      },
+      "height": 1.88,
+      "radius": 0.22,
+      "importance": 4
+    }
+  ]
+}
