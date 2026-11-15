@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 1 });
+const errors = [];
+p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+p.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+await p.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle' });
+await p.waitForTimeout(2500);
+const st = await p.evaluate(() => window.framingDemo?.getState());
+console.log('STATE', JSON.stringify({ status: st?.status, lens: st?.lensMode, fov: st?.camera?.fovDeg, scenario: st?.scenario, reports: st?.reports?.map(r=>[r.id, r.insideSafe, +r.maxOverflow.toFixed(4)]) }, null, 1));
+console.log('ERRORS', errors.slice(0, 10));
+await p.screenshot({ path: '/tmp/shot1.png' });
+await b.close();
