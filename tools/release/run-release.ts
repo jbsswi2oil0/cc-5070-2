@@ -450,6 +450,7 @@ function finish(outDir: string, url: string | null): number {
     url,
     provenance,
     pass,
+    adopt: pass ? 'allowed' : 'forbidden',
     artifactPolicy: config.artifactPolicy,
     totals: {
       total: checks.length,
@@ -472,6 +473,7 @@ function renderMarkdown(s: {
   url: string | null;
   provenance: Record<string, string>;
   pass: boolean;
+  adopt: string;
   artifactPolicy: { adoptOnlyWhen: string; note: string };
   totals: { total: number; passed: number; failed: number };
   checks: Check[];
@@ -483,7 +485,7 @@ function renderMarkdown(s: {
   lines.push(`- 生成时间：${s.generatedAt}`);
   lines.push(`- 运行地址：${s.url ?? '—'}`);
   lines.push(`- 执行目录：${s.provenance.mode}${s.provenance.sourceRev ? ` · 源码 \`${s.provenance.sourceRev}\`` : ''}`);
-  lines.push(`- 结论：**${s.pass ? 'PASS（可采纳产物）' : 'FAIL（禁止采用产物）'}**`);
+  lines.push(`- 结论：**${s.pass ? 'PASS（可采纳产物）' : 'FAIL（禁止采用产物）'}** · 产物采纳：${s.adopt === 'allowed' ? '允许' : '禁止'}`);
   lines.push(`- 通过：${s.totals.passed}/${s.totals.total}`);
   lines.push(`- 产物策略：${s.artifactPolicy.note}`);
   lines.push('');
