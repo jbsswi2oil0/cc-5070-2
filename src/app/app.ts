@@ -22,6 +22,8 @@ interface AppState {
   hoveredId: string | null;
   showPlan: boolean;
   dirty: boolean;
+  solveCount: number;
+  lastSolveAt: number;
 }
 
 interface Dom {
@@ -54,6 +56,8 @@ interface Dom {
   beatLabel: HTMLElement;
   beatNotes: HTMLElement;
   statusLine: HTMLElement;
+  targetBounds: HTMLElement;
+  reframeButton: HTMLButtonElement;
   resultGrid: HTMLElement;
   tradeoffCard: HTMLElement;
   tradeoffBody: HTMLElement;
@@ -104,6 +108,8 @@ export function mountApp(root: HTMLElement): void {
     hoveredId: null,
     showPlan: true,
     dirty: true,
+    solveCount: 0,
+    lastSolveAt: 0,
   };
   if (state.beatIndex > 0) {
     const positions = beatStartPositions(scenario, state.beatIndex);
@@ -155,6 +161,8 @@ export function mountApp(root: HTMLElement): void {
     state.result = res;
     state.previousParams = res.camera.params;
     state.dirty = false;
+    state.solveCount += 1;
+    state.lastSolveAt = performance.now();
     layoutFrame();
     stage.setActors(state.actors);
     stage.applySolution(res.camera, state.aspect);
@@ -230,6 +238,23 @@ export function mountApp(root: HTMLElement): void {
         : '约束取舍';
     dom.statusLine.dataset.status = res.status;
     dom.statusLine.innerHTML = `<span class="status-dot"></span><strong>${statusText}</strong><span class="status-sub">${insideCount}/${res.evaluation.actors.length} 角色完整位于安全区</span>`;
+
+    // Target bounds come from the dense projection reports, so the readout is a
+    // restatement of what the kernel measured, never an independent guess.
+    const union = res.evaluation.union;
+    const outSides: string[] = [];
+    if (union.left < res.safe.left - 1e-3) outSides.push('左');
+    if (union.right > res.safe.right + 1e-3) outSides.push('右');
+    if (union.top > res.safe.top + 1e-3) outSides.push('上');
+    if (union.bottom < res.safe.bottom + 1e-3) outSides.push('下');
+    const wPct = ((union.right - union.left) / 2) * 100;
+    const hPct = ((union.top - union.bottom) / 2) * 100;
+    dom.targetBounds.innerHTML = `
+      <span class="target-bounds-head">目标边界（全部角色包络并集）</span>
+      <span class="target-bounds-row"><b>X</b> ${union.left.toFixed(3)} → ${union.right.toFixed(3)} · <b>Y</b> ${union.bottom.toFixed(3)} → ${union.top.toFixed(3)} <span class="muted">NDC</span></span>
+      <span class="target-bounds-row">画幅占比 ${wPct.toFixed(1)}% × ${hPct.toFixed(1)}% · 安全区 ${res.safe.left.toFixed(2)}…${res.safe.right.toFixed(2)} / ${res.safe.bottom.toFixed(2)}…${res.safe.top.toFixed(2)}</span>
+      <span class="target-bounds-row ${outSides.length ? 'is-over' : 'is-in'}">${outSides.length ? `越过安全区：${outSides.join(' / ')}` : '全部目标边界位于安全区内'}</span>`;
+    dom.targetBounds.dataset.overflow = String(outSides.length > 0);
 
     dom.resultGrid.innerHTML = [
       cell('相机位置', `${c.position.x.toFixed(2)}, ${c.position.y.toFixed(2)}, ${c.position.z.toFixed(2)}`, 'm · 机位'),
@@ -467,6 +492,14 @@ export function mountApp(root: HTMLElement): void {
     dom.togglePlan.textContent = state.showPlan ? '隐藏平面示意' : '显示平面示意';
     drawOverlays();
   });
+  // Explicit GUI reframe entry: re-run the shared-framing controller on the
+  // current actors/constraints. It shares solveNow() with drags, margins and
+  // playback, so pressing it cannot diverge from the live solve.
+  dom.reframeButton.addEventListener('click', () => {
+    state.previousParams = null;
+    solveNow();
+    flash(dom.reframeButton, '已重新取景');
+  });
   dom.copyLink.addEventListener('click', async () => {
     updateReplayHash();
     try {
@@ -636,6 +669,13 @@ export function mountApp(root: HTMLElement): void {
       tradeoff: state.result?.tradeoff,
       suggestion: state.result?.suggestion,
       beatIndex: state.beatIndex,
+      beatCount: state.scenario.beats.length,
+      beats: state.scenario.beats.map((b) => ({ label: b.label, duration: b.duration })),
+      beatT: state.beatT,
+      playing: state.playing,
+      dirty: state.dirty,
+      solveCount: state.solveCount,
+      lastSolveAt: state.lastSolveAt,
       selectedId: state.selectedId,
       hash: location.hash,
     }),
@@ -661,6 +701,24 @@ export function mountApp(root: HTMLElement): void {
       state.previousParams = null;
       solveNow();
     },
+    updateActor: (
+      id: string,
+      patch: Partial<Pick<Actor, 'height' | 'radius' | 'importance' | 'name'>>,
+    ): boolean => {
+      const actor = state.actors.find((a) => a.id === id);
+      if (!actor) return false;
+      if (patch.height !== undefined) actor.height = Math.max(0.6, patch.height);
+      if (patch.radius !== undefined) actor.radius = Math.max(0.1, patch.radius);
+      if (patch.importance !== undefined) {
+        actor.importance = Math.max(1, Math.min(5, Math.round(patch.importance)));
+      }
+      if (patch.name !== undefined && patch.name.trim()) actor.name = patch.name.trim();
+      state.previousParams = null;
+      stage.setActors(state.actors);
+      renderActorInspector();
+      solveNow();
+      return true;
+    },
     setConstraint: (key: 'fovMaxDeg' | 'horizontalFovMaxDeg' | 'distanceMax' | 'workingFovDeg' | 'yawDeg', value: number) => {
       state.overrides[key] = value;
       dom[key === 'fovMaxDeg' ? 'fovMax' : key === 'horizontalFovMaxDeg' ? 'hFovMax' : key === 'distanceMax' ? 'distanceMax' : key === 'workingFovDeg' ? 'workingFov' : 'yaw'].value = String(value);
@@ -676,6 +734,30 @@ export function mountApp(root: HTMLElement): void {
     setPlaying: (on: boolean) => {
       state.playing = on;
       renderTransport();
+    },
+    /** Stop playback without reverting positions, so a captured pose stays put. */
+    pause: () => {
+      state.playing = false;
+      renderTransport();
+    },
+    /**
+     * Move several actors in one solve. Used by the release runner to stage
+     * deployment scenarios (dispersed / clustered, mixed body sizes) and to
+     * drive the in-scene multi-actor moves deterministically.
+     */
+    positionActors: (positions: Array<{ id: string; x: number; y: number; z: number }>): string[] => {
+      const applied: string[] = [];
+      for (const p of positions) {
+        const actor = state.actors.find((a) => a.id === p.id);
+        if (!actor) continue;
+        actor.position = { x: p.x, y: p.y, z: p.z };
+        applied.push(p.id);
+      }
+      state.playing = false;
+      state.previousParams = null;
+      stage.setActors(state.actors);
+      solveNow();
+      return applied;
     },
     tickOnce: (dt: number) => {
       // Advance playback by `dt` ms without waiting a frame; used by headless
@@ -799,6 +881,8 @@ function collect(root: HTMLElement): Dom {
     beatLabel: q<HTMLElement>('#beat-label'),
     beatNotes: q<HTMLElement>('#beat-notes'),
     statusLine: q<HTMLElement>('#status-line'),
+    targetBounds: q<HTMLElement>('#target-bounds'),
+    reframeButton: q<HTMLButtonElement>('#reframe-button'),
     resultGrid: q<HTMLElement>('#result-grid'),
     tradeoffCard: q<HTMLElement>('#tradeoff-card'),
     tradeoffBody: q<HTMLElement>('#tradeoff-body'),
@@ -943,6 +1027,11 @@ function template(): string {
             <button id="copy-link" class="btn btn-quiet btn-small">复制可重放链接</button>
           </div>
           <div id="status-line" class="status-line"></div>
+          <div id="target-bounds" class="target-bounds" data-testid="target-bounds"></div>
+          <div class="reframe-row">
+            <button id="reframe-button" class="btn btn-primary btn-small">重新共同取景</button>
+            <span class="muted reframe-hint">对当前角色与约束重新执行同一求解内核</span>
+          </div>
           <div id="result-grid" class="result-grid"></div>
 
           <div id="tradeoff-card" class="card card-warn" hidden>

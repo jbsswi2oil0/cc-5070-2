@@ -1,0 +1,103 @@
+{
+  "releaseId": "shared-framing-2026-11-15",
+  "name": "共同取景发行 · 镜头演示发布",
+  "description": "镜头演示发布落实到运行配置：以真实控制器执行验收，读取目标屏幕范围与视场限制。禁止用预设机位视频代替控制器执行。",
+  "startup": {
+    "install": "npm install",
+    "build": "npm run build",
+    "serve": "npm run preview",
+    "url": "http://127.0.0.1:4173/",
+    "readySelector": "#status-line"
+  },
+  "guiEntry": {
+    "url": "http://127.0.0.1:4173/",
+    "reframeButton": "#reframe-button",
+    "playButton": "#play-button",
+    "replayButton": "#replay-button",
+    "scenarioSelect": "#scenario-select",
+    "marginControls": {
+      "left": "#margin-left",
+      "right": "#margin-right",
+      "top": "#margin-top",
+      "bottom": "#margin-bottom"
+    },
+    "targetBoundsReadout": "#target-bounds",
+    "note": "图形入口是主路径；命令行仅辅助共同取景（构建、启动、采集证据）。"
+  },
+  "scenario": "deployment",
+  "requiredActors": ["tall", "short", "broad", "slim"],
+  "bodySize": {
+    "minHeightSpreadMeters": 0.45,
+    "minRadiusSpreadMeters": 0.15,
+    "note": "不同体型检查：身高与半径都必须实际拉开差距，不能是同一模板。"
+  },
+  "targetScreenRange": {
+    "note": "安全区在屏幕归一化坐标中的允许范围，0=左/上边框，1=右/下边框。",
+    "safeLeft": [0.02, 0.2],
+    "safeRightEdge": [0.8, 0.98],
+    "safeTop": [0.02, 0.2],
+    "safeBottomEdge": [0.8, 0.98],
+    "targetInsideSafeTolerancePx": 2
+  },
+  "fovLimits": {
+    "verticalMaxDeg": 44,
+    "horizontalMaxDeg": 74,
+    "verticalMinDeg": 6,
+    "note": "验收读取视场限制：控制器输出不得超过上限，也不得低于下限。"
+  },
+  "distanceMax": 16,
+  "marginEdit": {
+    "targetPct": 12,
+    "tolerancePx": 3
+  },
+  "states": [
+    {
+      "id": "cluster_initial",
+      "label": "四人聚合（初始）",
+      "action": "boot",
+      "expect": "fitted"
+    },
+    {
+      "id": "gui_reframe_cluster",
+      "label": "界面按钮重新共同取景（聚合）",
+      "action": "clickReframe",
+      "expect": "fitted"
+    },
+    {
+      "id": "margin_edited",
+      "label": "界面滑杆改四向边距",
+      "action": "editMargins",
+      "expect": "fitted"
+    },
+    {
+      "id": "multi_actor_drag",
+      "label": "画布内拖动多名角色",
+      "action": "dragActors",
+      "expect": "solved"
+    },
+    {
+      "id": "dispersed",
+      "label": "目标横向与纵深分散",
+      "action": "disperse",
+      "expect": "tradeoff"
+    },
+    {
+      "id": "gui_reframe_dispersed",
+      "label": "界面按钮重新共同取景（分散）",
+      "action": "clickReframe",
+      "expect": "tradeoff"
+    },
+    {
+      "id": "recluster",
+      "label": "重新聚合",
+      "action": "recluster",
+      "expect": "fitted"
+    }
+  ],
+  "legacyScenarios": ["plaza", "stagger", "wide-spread", "two-shot"],
+  "legacyRequirement": "旧样例必须运行到底：逐段执行到末段并保持已解算，不允许中途失败或被跳过。",
+  "artifactPolicy": {
+    "adoptOnlyWhen": "pass",
+    "note": "共同取景失败禁止采用产物；只有原始记录核验通过后才允许采纳构建。"
+  }
+}

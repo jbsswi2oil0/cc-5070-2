@@ -811,6 +811,55 @@ input[type='range']::-moz-range-thumb {
   font-size: 10.5px;
 }
 
+/* ---------- target bounds read-out ---------- */
+.target-bounds {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: #0a1219;
+  border: 1px solid var(--line);
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.target-bounds-head {
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+}
+
+.target-bounds-row {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.target-bounds-row b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.target-bounds-row.is-in {
+  color: var(--good);
+}
+
+.target-bounds-row.is-over {
+  color: #ffb49e;
+}
+
+.reframe-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+
+.reframe-hint {
+  line-height: 1.35;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;

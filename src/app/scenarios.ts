@@ -178,6 +178,52 @@ export const scenarios: Scenario[] = [
       { label: '贴近对白', duration: 1600, moves: [{ actorId: 'left', to: [-1.0, 0.8, 0.9] }, { actorId: 'right', to: [1.1, 0, 0.3] }] },
     ],
   },
+  {
+    id: 'deployment',
+    name: '部署验收 · 分散与聚合',
+    subtitle:
+      '四名体型不同的角色（高个、宽体、瘦高、矮个）先聚合、再横向与纵深分散、最后重新聚拢。用于发布部署检查：同一套受限镜头在分散时需要取舍，聚合时恢复完整入画。',
+    actors: [
+      actor('tall', '高个', -1.6, 0.35, 0.3, 2.04, 5, '#5ec8e5', 0.4),
+      actor('short', '矮个', -0.5, 0, 0.7, 1.42, 2, '#f08a4b', 0.26),
+      actor('broad', '宽体', 0.7, 0, 0.2, 1.74, 3, '#d6bf6a', 0.46),
+      actor('slim', '瘦高', 1.9, 0, 0.6, 1.88, 4, '#b48be0', 0.22),
+    ],
+    constraints: {
+      yawDeg: 0,
+      fovMaxDeg: 44,
+      fovMinDeg: 6,
+      horizontalFovMaxDeg: 74,
+      workingFovDeg: 38,
+      distanceMin: 1.6,
+      distanceMax: 16,
+      margins: margins(0.08, 0.08, 0.08, 0.08),
+      minCameraHeight: 0.3,
+    },
+    beats: [
+      { label: '四人聚合', duration: 900, moves: [] },
+      {
+        label: '横向与纵深分散',
+        duration: 2000,
+        moves: [
+          { actorId: 'tall', to: [-10.5, 1.1, 3.0] },
+          { actorId: 'short', to: [9.0, 0, -3.4] },
+          { actorId: 'broad', to: [1.2, 0, 8.2] },
+          { actorId: 'slim', to: [-2.4, 0, -7.6] },
+        ],
+      },
+      {
+        label: '重新聚合',
+        duration: 2000,
+        moves: [
+          { actorId: 'tall', to: [-1.6, 0.35, 0.3] },
+          { actorId: 'short', to: [-0.5, 0, 0.7] },
+          { actorId: 'broad', to: [0.7, 0, 0.2] },
+          { actorId: 'slim', to: [1.9, 0, 0.6] },
+        ],
+      },
+    ],
+  },
 ];
 
 export function scenarioById(id: string): Scenario {

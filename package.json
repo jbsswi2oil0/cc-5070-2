@@ -10,7 +10,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "release": "vite-node tools/release/run-release.ts --",
+    "release:clean": "bash tools/release/run-in-clean-dir.sh",
+    "frame": "vite-node tools/release/frame-cli.ts --"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",

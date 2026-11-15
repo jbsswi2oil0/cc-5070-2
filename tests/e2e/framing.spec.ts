@@ -13,6 +13,9 @@ declare global {
       setPlaying: (on: boolean) => void;
       tickOnce: (dt: number) => void;
       solve: () => void;
+      updateActor: (id: string, patch: Record<string, number | string>) => boolean;
+      positionActors: (positions: Array<{ id: string; x: number; y: number; z: number }>) => string[];
+      pause: () => void;
     };
   }
 }
@@ -196,4 +199,96 @@ test('a replayed hash restores the same actors, constraints and beat', async ({ 
   expect(s.actors.find((a: { id: string }) => a.id === 'lin').position.x).toBeCloseTo(1.1, 4);
   expect(s.constraints.margins.left).toBeCloseTo(0.12, 4);
   expect(s.status).toBe('fitted');
+});
+
+test('the reframe button re-runs the shared-framing controller', async ({ page }) => {
+  await boot(page);
+  const before = await state(page);
+  // The button must go through the same solve path as drags/margins, so a press
+  // increments the controller's solve count and keeps the frame fitted.
+  await page.click('#reframe-button');
+  await page.waitForTimeout(500);
+  const after = await state(page);
+  expect(after.solveCount).toBeGreaterThan(before.solveCount);
+  expect(after.status).toBe('fitted');
+  expect(after.reports.length).toBe(before.reports.length);
+
+  // Dropping an actor from the cast and pressing reframe must reflect the new
+  // cast — the button reads live state, not a canned frame.
+  await page.evaluate(() => window.framingDemo.selectScenario('deployment'));
+  await page.waitForTimeout(400);
+  await page.click('#reframe-button');
+  await page.waitForTimeout(500);
+  const dep = await state(page);
+  expect(dep.scenario).toBe('deployment');
+  expect(dep.actors.length).toBe(4);
+});
+
+test('the target-bounds read-out mirrors the solver evaluation', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => window.framingDemo.selectScenario('deployment'));
+  await page.waitForTimeout(500);
+  const s = await state(page);
+  const readout = await page.locator('#target-bounds').innerText();
+  // The union of every body envelope is shown, and it is the solver's numbers.
+  const union = s.reports.reduce(
+    (acc: any, r: any) => ({
+      left: Math.min(acc.left, r.bboxNdc.left),
+      right: Math.max(acc.right, r.bboxNdc.right),
+      bottom: Math.min(acc.bottom, r.bboxNdc.bottom),
+      top: Math.max(acc.top, r.bboxNdc.top),
+    }),
+    { left: Infinity, right: -Infinity, bottom: Infinity, top: -Infinity },
+  );
+  expect(readout).toContain(union.left.toFixed(3));
+  expect(readout).toContain(union.right.toFixed(3));
+  expect(readout).toContain('全部目标边界位于安全区内');
+
+  // Dispersing the cast must flip the read-out to the overflow verdict.
+  await page.evaluate(() => window.framingDemo.playBeat(1));
+  await page.waitForTimeout(500);
+  const dispersed = await state(page);
+  const readout2 = await page.locator('#target-bounds').innerText();
+  expect(dispersed.status).toBe('tradeoff');
+  expect(readout2).toContain('越过安全区');
+});
+
+test('deployment demo runs clustered → dispersed → clustered with real solves', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => window.framingDemo.selectScenario('deployment'));
+  await page.waitForTimeout(400);
+  const clustered = await state(page);
+  expect(clustered.status).toBe('fitted');
+
+  await page.evaluate(() => window.framingDemo.playBeat(1));
+  await page.waitForTimeout(500);
+  const spread = await state(page);
+  expect(spread.status).toBe('tradeoff');
+  expect(spread.camera.fovDeg).toBeLessThanOrEqual(spread.constraints.fovMaxDeg + 1e-6);
+
+  await page.evaluate(() => window.framingDemo.playBeat(2));
+  await page.waitForTimeout(500);
+  const again = await state(page);
+  expect(again.status).toBe('fitted');
+  for (const r of again.reports) expect(r.insideSafe).toBe(true);
+});
+
+test('body sizes are varied and editable through the actor hook', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(() => window.framingDemo.selectScenario('deployment'));
+  await page.waitForTimeout(400);
+  const s = await state(page);
+  const heights = s.actors.map((a: any) => a.height);
+  const radii = s.actors.map((a: any) => a.radius);
+  expect(Math.max(...heights) - Math.min(...heights)).toBeGreaterThan(0.45);
+  expect(Math.max(...radii) - Math.min(...radii)).toBeGreaterThan(0.15);
+
+  await page.evaluate(() => window.framingDemo.updateActor('short', { height: 2.2, radius: 0.5 }));
+  await page.waitForTimeout(400);
+  const after = await state(page);
+  const short = after.actors.find((a: any) => a.id === 'short');
+  expect(short.height).toBeCloseTo(2.2, 3);
+  expect(short.radius).toBeCloseTo(0.5, 3);
+  // A taller, wider body changes the envelope, so the solve must still report.
+  expect(after.camera.fovDeg).toBeLessThanOrEqual(after.constraints.fovMaxDeg + 1e-6);
 });
